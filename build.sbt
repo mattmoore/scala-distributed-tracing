@@ -37,3 +37,8 @@ lazy val root = project
     // To cross compile with Scala 3 and Scala 2
     crossScalaVersions := Seq(scala3Version, scala2Version)
   )
+
+lazy val product = project
+  .settings(
+    name := "product"
+  )
