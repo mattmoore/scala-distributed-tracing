@@ -1,12 +1,14 @@
 package io.mattmoore.store.user.database
 
-import cats.effect._
+import cats.effect.*
 import cats.effect.unsafe.implicits.global
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import com.dimafeng.testcontainers.munit.TestContainersForAll
 import doobie.util.transactor.Transactor
-import io.mattmoore.store.user.algebras._
-import io.mattmoore.store.user.domain._
+import io.mattmoore.store.user.algebras.*
+import io.mattmoore.store.user.domain.*
+import org.flywaydb.core.Flyway
+import org.flywaydb.core.api.configuration.Configuration
 
 import java.util.UUID
 
@@ -14,7 +16,15 @@ class DatabaseSuite extends munit.FunSuite with TestContainersForAll {
   override type Containers = PostgreSQLContainer
 
   override def startContainers(): PostgreSQLContainer = {
-    PostgreSQLContainer.Def().start()
+    val psql = PostgreSQLContainer.Def("postgres:14").start()
+    val flyway = Flyway
+      .configure()
+      .mixed(true)
+      .baselineOnMigrate(true)
+      .dataSource(psql.container.getJdbcUrl, psql.container.getUsername, psql.container.getPassword)
+      .load()
+      .migrate()
+    psql
   }
 
   type F[A] = IO[A]
