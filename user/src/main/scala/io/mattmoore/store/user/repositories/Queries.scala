@@ -1,4 +1,4 @@
-package io.mattmoore.store.user.database
+package io.mattmoore.store.user.repositories
 
 import doobie._
 import doobie.implicits._

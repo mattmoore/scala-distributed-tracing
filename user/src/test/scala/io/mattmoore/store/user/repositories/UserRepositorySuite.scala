@@ -1,4 +1,4 @@
-package io.mattmoore.store.user.database
+package io.mattmoore.store.user.repositories
 
 import cats.effect._
 import cats.effect.unsafe.implicits.global

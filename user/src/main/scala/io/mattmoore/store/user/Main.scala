@@ -4,7 +4,7 @@ import cats.effect._
 import doobie._
 import io.mattmoore.store.user.algebras._
 import io.mattmoore.store.user.domain._
-import io.mattmoore.store.user.database._
+import io.mattmoore.store.user.repositories._
 import io.mattmoore.store.user.services._
 
 object Main extends IOApp {

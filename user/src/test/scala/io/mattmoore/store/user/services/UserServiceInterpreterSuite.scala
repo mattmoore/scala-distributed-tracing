@@ -6,13 +6,13 @@ import com.dimafeng.testcontainers.munit.TestContainersForEach
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import doobie.util.transactor.Transactor
 import io.mattmoore.store.user.algebras._
-import io.mattmoore.store.user.database._
+import io.mattmoore.store.user.repositories._
 import io.mattmoore.store.user.domain._
 
 import java.util.UUID
 import org.flywaydb.core.Flyway
 
-class UserServiceSuite extends munit.FunSuite with TestContainersForEach {
+class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForEach {
   override type Containers = PostgreSQLContainer
 
   override def startContainers(): PostgreSQLContainer = {
@@ -30,7 +30,6 @@ class UserServiceSuite extends munit.FunSuite with TestContainersForEach {
   type F[A] = IO[A]
 
   test("getUser returns a user for the ID") {
-
     withContainers { case psql =>
       val userRepository: Repository[F, User] = new UserRepository(
         Transactor.fromDriverManager[F](
@@ -41,14 +40,24 @@ class UserServiceSuite extends munit.FunSuite with TestContainersForEach {
         )
       )
       val userService: UserService[F] = new UserServiceInterpreter[F](userRepository)
-      val expected = User(
-        id = Some(UUID.fromString("32fe8628-4182-4900-9e52-b3c5304f97da")),
+
+      val userToAdd = User(
         firstName = "Matt",
         lastName = "Moore",
         email = "matt@mattmoore.io",
         address = "123 Anywhere Street, Chicago, IL"
       )
-      val actual = userService.getUser(expected.id.get).unsafeRunSync()
+
+      val dbUserId = userService.addUser(userToAdd).unsafeRunSync()
+
+      val expected = User(
+        id = Some(dbUserId),
+        firstName = "Matt",
+        lastName = "Moore",
+        email = "matt@mattmoore.io",
+        address = "123 Anywhere Street, Chicago, IL"
+      )
+      val actual = userService.getUser(dbUserId).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }
@@ -65,14 +74,14 @@ class UserServiceSuite extends munit.FunSuite with TestContainersForEach {
       )
       val userService: UserService[F] = new UserServiceInterpreter[F](userRepository)
       val userToAdd = User(
+        id = Some(UUID.fromString("32fe8628-4182-4900-9e52-b3c5304f97da")),
         firstName = "Matt",
         lastName = "Moore",
         email = "matt@mattmoore.io",
         address = "123 Anywhere Street, Chicago, IL"
       )
-      val expected = UUID.fromString("32fe8628-4182-4900-9e52-b3c5304f97da")
       val actual = userService.addUser(userToAdd).unsafeRunSync()
-      assertEquals(actual, expected)
+      assert(!actual.toString.isEmpty)
     }
   }
 
@@ -87,24 +96,22 @@ class UserServiceSuite extends munit.FunSuite with TestContainersForEach {
         )
       )
       val userService: UserService[F] = new UserServiceInterpreter[F](userRepository)
+
       val initialUser = User(
         firstName = "Matt",
         lastName = "Moore",
         email = "matt@mattmoore.io",
         address = "123 Anywhere Street, Chicago, IL"
       )
-      val userToUpdate = User(
-        id = Some(UUID.fromString("32fe8628-4182-4900-9e52-b3c5304f97da")),
+      val userUpdate = User(
         firstName = "Matthew",
         lastName = "Moore",
         email = "matt@mattmoore.io",
         address = "123 Anywhere Street, Chicago, IL"
       )
 
-      userService.addUser(initialUser).unsafeRunSync()
-
-      val expected = UUID.fromString("32fe8628-4182-4900-9e52-b3c5304f97da")
-      val actual = userService.updateUser(userToUpdate).unsafeRunSync()
+      val expected = userService.addUser(initialUser).unsafeRunSync()
+      val actual = userService.updateUser(userUpdate).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }
