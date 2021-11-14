@@ -1,4 +1,4 @@
-package io.mattmoore.scala.distributedtracing
+package io.mattmoore.store.product
 
 class MainSuite extends munit.FunSuite {
   test("Scala 3 compiles") {

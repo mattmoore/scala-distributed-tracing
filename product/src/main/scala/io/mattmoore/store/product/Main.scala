@@ -1,4 +1,4 @@
-package io.mattmoore.scala.distributedtracing
+package io.mattmoore.store.product
 
 object Main {
 
