@@ -2,6 +2,8 @@ package io.mattmoore.store.user.services
 
 import cats.effect._
 import cats.effect.unsafe.implicits.global
+import com.dimafeng.testcontainers.munit.TestContainersForAll
+import com.dimafeng.testcontainers.PostgreSQLContainer
 import doobie.util.transactor.Transactor
 import io.mattmoore.store.user.algebras._
 import io.mattmoore.store.user.database._
@@ -9,7 +11,13 @@ import io.mattmoore.store.user.domain._
 
 import java.util.UUID
 
-class UserServiceSuite extends munit.FunSuite {
+class UserServiceSuite extends munit.FunSuite with TestContainersForAll {
+  override type Containers = PostgreSQLContainer
+
+  override def startContainers(): PostgreSQLContainer = {
+    PostgreSQLContainer.Def().start()
+  }
+
   type F[A] = IO[A]
 
   val xa: Transactor[F] = Transactor.fromDriverManager[F](

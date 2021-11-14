@@ -13,6 +13,7 @@ val MunitV = "0.7.29"
 val NatchezV = "0.1.5"
 val LogbackV = "1.2.6"
 val MunitCatsEffectV = "1.0.6"
+val TestContainersV = "0.39.11"
 
 lazy val root = project
   .in(file("."))
@@ -21,9 +22,7 @@ lazy val root = project
   )
 
 lazy val CommonSettings = Seq(
-  // To make the default compiler and REPL use Dotty
   scalaVersion := scalaV3,
-  // To cross compile with Scala 3 and Scala 2
   crossScalaVersions := Seq(scalaV3, scalaV2),
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % CatsCoreV,
@@ -40,7 +39,9 @@ lazy val CommonSettings = Seq(
     "org.flywaydb" % "flyway-core" % FlywayV,
     "ch.qos.logback" % "logback-classic" % LogbackV,
     "org.scalameta" %% "munit" % MunitV % Test,
-    "org.typelevel" %% "munit-cats-effect-3" % MunitCatsEffectV % Test
+    "org.typelevel" %% "munit-cats-effect-3" % MunitCatsEffectV % Test,
+    "com.dimafeng" %% "testcontainers-scala-munit" % TestContainersV % "test,it",
+    "com.dimafeng" %% "testcontainers-scala-postgresql" % TestContainersV % "test,it"
   )
 )
 
