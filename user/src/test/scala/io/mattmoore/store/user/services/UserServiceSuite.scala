@@ -26,7 +26,7 @@ class UserServiceSuite extends munit.FunSuite with TestContainersForAll {
     "postgres",
     ""
   )
-  val db: DatabaseAlgebra[F] = new Database(xa)
+  val db: Repository[F] = new UserRepository(xa)
   val userService: UserServiceAlgebra[F] = new UserService[F](db)
 
   test("getUser returns a user for the ID") {

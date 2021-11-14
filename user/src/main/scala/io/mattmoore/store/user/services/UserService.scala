@@ -6,7 +6,7 @@ import io.mattmoore.store.user.domain._
 
 import java.util.UUID
 
-class UserService[F[_]: Async](db: DatabaseAlgebra[F]) extends UserServiceAlgebra[F] {
+class UserService[F[_]: Async](db: Repository[F]) extends UserServiceAlgebra[F] {
   def getUser(id: UUID): F[User] =
     db.getUser(id)
 

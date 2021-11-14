@@ -16,7 +16,7 @@ object Main extends IOApp {
       "postgres",
       ""
     )
-    val db: DatabaseAlgebra[F] = new Database(xa)
+    val db: Repository[F] = new UserRepository(xa)
     val userService: UserServiceAlgebra[F] = new UserService[F](db)
 
     IO(ExitCode.Success)

@@ -9,7 +9,7 @@ import io.mattmoore.store.user.domain.User
 
 import java.util.UUID
 
-class Database[F[_]: Async](xa: Transactor[F]) extends DatabaseAlgebra[F] {
+class UserRepository[F[_]: Async](xa: Transactor[F]) extends Repository[F] {
   override def getUser(id: UUID): F[User] =
     Queries
       .selectUser(id)
