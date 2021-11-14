@@ -18,7 +18,7 @@ object Main extends IOApp {
       ""
     )
     val userRepository: Repository[F, User] = new UserRepository(xa)
-    val userService: UserServiceAlgebra[F] = new UserService[F](userRepository)
+    val userService: UserService[F] = new UserServiceInterpreter[F](userRepository)
 
     IO(ExitCode.Success)
   }

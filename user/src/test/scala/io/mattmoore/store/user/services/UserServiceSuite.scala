@@ -27,7 +27,7 @@ class UserServiceSuite extends munit.FunSuite with TestContainersForAll {
     ""
   )
   val userRepository: Repository[F, User] = new UserRepository(xa)
-  val userService: UserServiceAlgebra[F] = new UserService[F](userRepository)
+  val userService: UserService[F] = new UserServiceInterpreter[F](userRepository)
 
   test("getUser returns a user for the ID") {
     val expected = User(

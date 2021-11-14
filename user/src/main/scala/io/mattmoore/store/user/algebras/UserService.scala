@@ -4,7 +4,7 @@ import io.mattmoore.store.user.domain._
 
 import java.util.UUID
 
-trait UserServiceAlgebra[F[_]] {
+trait UserService[F[_]] {
   def getUser(id: UUID): F[User]
   def addUser(user: User): F[UUID]
   def updateUser(user: User): F[UUID]
