@@ -6,13 +6,13 @@ import io.mattmoore.store.user.domain._
 
 import java.util.UUID
 
-class UserService[F[_]: Async](db: Repository[F]) extends UserServiceAlgebra[F] {
+class UserService[F[_]: Async](db: Repository[F, User]) extends UserServiceAlgebra[F] {
   def getUser(id: UUID): F[User] =
-    db.getUser(id)
+    db.query(id)
 
   def addUser(user: User): F[UUID] =
-    db.addUser(user)
+    db.insert(user)
 
   def updateUser(user: User): F[UUID] =
-    db.updateUser(user)
+    db.update(user)
 }

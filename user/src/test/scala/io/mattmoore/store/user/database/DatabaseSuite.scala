@@ -31,7 +31,7 @@ class UserRepositorySuite extends munit.FunSuite with TestContainersForEach {
 
   test("getUser returns a user for the ID") {
     withContainers { case psql =>
-      val db: Repository[F] = new UserRepository(
+      val repo: Repository[F, User] = new UserRepository(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -47,7 +47,7 @@ class UserRepositorySuite extends munit.FunSuite with TestContainersForEach {
         address = "123 Anywhere Street, Chicago, IL"
       )
 
-      val dbUserId = db.addUser(userToAdd).unsafeRunSync()
+      val dbUserId = repo.insert(userToAdd).unsafeRunSync()
 
       val expected = User(
         id = Some(dbUserId),
@@ -56,14 +56,14 @@ class UserRepositorySuite extends munit.FunSuite with TestContainersForEach {
         email = "matt@mattmoore.io",
         address = "123 Anywhere Street, Chicago, IL"
       )
-      val actual = db.getUser(dbUserId).unsafeRunSync()
+      val actual = repo.query(dbUserId).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }
 
   test("addUser adds a user and returns the new user's ID") {
     withContainers { case psql =>
-      val db: Repository[F] = new UserRepository(
+      val repo: Repository[F, User] = new UserRepository(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -78,14 +78,14 @@ class UserRepositorySuite extends munit.FunSuite with TestContainersForEach {
         email = "matt@mattmoore.io",
         address = "123 Anywhere Street, Chicago, IL"
       )
-      val actual = db.addUser(userToAdd).unsafeRunSync()
+      val actual = repo.insert(userToAdd).unsafeRunSync()
       assert(!actual.toString.isEmpty)
     }
   }
 
   test("updateUser updates an existing user and returns the updated user record") {
     withContainers { case psql =>
-      val db: Repository[F] = new UserRepository(
+      val repo: Repository[F, User] = new UserRepository(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -106,8 +106,8 @@ class UserRepositorySuite extends munit.FunSuite with TestContainersForEach {
         address = "123 Anywhere Street, Chicago, IL"
       )
 
-      val expected = db.addUser(initialUser).unsafeRunSync()
-      val actual = db.updateUser(userUpdate).unsafeRunSync()
+      val expected = repo.insert(initialUser).unsafeRunSync()
+      val actual = repo.update(userUpdate).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }
