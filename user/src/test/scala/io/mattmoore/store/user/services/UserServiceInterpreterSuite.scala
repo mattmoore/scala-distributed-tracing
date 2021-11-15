@@ -8,6 +8,7 @@ import doobie.util.transactor.Transactor
 import io.mattmoore.store.user.algebras._
 import io.mattmoore.store.user.repositories._
 import io.mattmoore.store.user.domain._
+import natchez.Trace.Implicits.noop
 
 import java.util.UUID
 import org.flywaydb.core.Flyway

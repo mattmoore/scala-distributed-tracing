@@ -33,6 +33,7 @@ lazy val CommonSettings = Seq(
     "co.fs2" %% "fs2-reactive-streams" % Fs2V,
     "com.github.fd4s" %% "fs2-kafka" % Fs2KafkaV,
     "org.tpolecat" %% "natchez-core" % NatchezV,
+    "org.tpolecat" %% "natchez-jaeger" % NatchezV,
     "org.tpolecat" %% "doobie-core" % DoobieV,
     "org.tpolecat" %% "doobie-h2" % DoobieV,
     "org.tpolecat" %% "doobie-hikari" % DoobieV,
@@ -58,7 +59,8 @@ lazy val user = project
       "org.http4s" %% "http4s-circe" % Http4sV,
       "org.http4s" %% "http4s-dsl" % Http4sV,
       "io.circe" %% "circe-generic" % CirceV
-    )
+    ),
+    fork := true
   )
   .configs(IntegrationTest)
   .settings(Defaults.itSettings)
@@ -74,7 +76,8 @@ lazy val product = project
       "org.http4s" %% "http4s-circe" % Http4sV,
       "org.http4s" %% "http4s-dsl" % Http4sV,
       "io.circe" %% "circe-generic" % CirceV
-    )
+    ),
+    fork := true
   )
   .configs(IntegrationTest)
   .settings(Defaults.itSettings)

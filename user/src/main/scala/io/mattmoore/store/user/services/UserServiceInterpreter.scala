@@ -3,10 +3,11 @@ package io.mattmoore.store.user.services
 import cats.effect._
 import io.mattmoore.store.user.algebras._
 import io.mattmoore.store.user.domain._
+import natchez._
 
 import java.util.UUID
 
-class UserServiceInterpreter[F[_]: Async](repository: Repository[F, User]) extends UserService[F] {
+class UserServiceInterpreter[F[_]: Async: natchez.Trace](repository: Repository[F, User]) extends UserService[F] {
   def getUser(id: UUID): F[User] =
     repository.query(id)
 
