@@ -7,13 +7,19 @@ import natchez._
 
 import java.util.UUID
 
-class UserServiceInterpreter[F[_]: Async: natchez.Trace](repository: Repository[F, User]) extends UserService[F] {
+class UserServiceInterpreter[F[_]: Async: natchez.Trace](repository: Repository[F, User])(implicit tracer: natchez.Trace[F]) extends UserService[F] {
   def getUser(id: UUID): F[User] =
-    repository.query(id)
+    tracer.span(s"Get user with ID $id") {
+      repository.query(id)
+    }
 
   def addUser(user: User): F[UUID] =
-    repository.insert(user)
+    tracer.span(s"Add user with info $user") {
+      repository.insert(user)
+    }
 
   def updateUser(user: User): F[UUID] =
-    repository.update(user)
+    tracer.span(s"Update user with info $user") {
+      repository.update(user)
+    }
 }

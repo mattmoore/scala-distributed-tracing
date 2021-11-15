@@ -9,8 +9,8 @@ import io.mattmoore.store.user.algebras._
 import io.mattmoore.store.user.domain._
 import io.mattmoore.store.user.repositories._
 import io.mattmoore.store.user.services._
-import natchez.Trace.Implicits.noop
 import natchez._
+import org.flywaydb.core.Flyway
 
 object Main extends IOApp {
   type F[A] = IO[A]
@@ -30,24 +30,45 @@ object Main extends IOApp {
 
   override def run(args: List[String]): F[ExitCode] = {
     entryPoint[F].use { ep =>
-      val xa: Transactor[F] = Transactor.fromDriverManager[F](
-        "org.postgresql.Driver",
-        "jdbc:postgresql:user",
-        "postgres",
-        "password"
-      )
-      val userRepository: Repository[F, User] = new UserRepository(xa)
-      val userService: UserService[F] = new UserServiceInterpreter[F](userRepository)
+      ep.root("Starting the app").use { span =>
+        Trace.ioTrace(span).flatMap { implicit trace =>
+          implicit val natchez = span
+          val xa: Transactor[F] = Transactor.fromDriverManager[F](
+            "org.postgresql.Driver",
+            "jdbc:postgresql:users",
+            "postgres",
+            "password"
+          )
+          Flyway
+            .configure()
+            .mixed(true)
+            .baselineOnMigrate(true)
+            .dataSource("jdbc:postgresql:users", "postgres", "password")
+            .load()
+            .migrate()
+          val userRepository: Repository[F, User] = new UserRepository(xa)
+          val userService: UserService[F] = new UserServiceInterpreter[F](userRepository)
 
-      val consumerSettings =
-        ConsumerSettings[F, String, String]
-          .withAutoOffsetReset(AutoOffsetReset.Earliest)
-          .withBootstrapServers("localhost:9092")
-          .withGroupId("group")
+          val consumerSettings =
+            ConsumerSettings[F, String, String]
+              .withAutoOffsetReset(AutoOffsetReset.Earliest)
+              .withBootstrapServers("localhost:9092")
+              .withGroupId("group")
 
-      KafkaConsumer.stream(consumerSettings)
+          KafkaConsumer.stream(consumerSettings)
 
-      IO(ExitCode.Success)
+          userService
+            .addUser(
+              User(
+                firstName = "Matt",
+                lastName = "Moore",
+                email = "matt@mattmoore.io",
+                address = "123 Anywhere Street, Chicago, IL"
+              )
+            )
+            .as(ExitCode.Success)
+        }
+      }
     }
   }
 }

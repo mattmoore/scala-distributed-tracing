@@ -3,6 +3,7 @@ val scalaV3 = "3.1.0"
 
 val CatsCoreV = "2.6.1"
 val CatsEffectV = "3.2.9"
+val Log4CatsV = "2.1.1"
 val Http4sV = "0.23.6"
 val CirceV = "0.14.1"
 val DeclineV = "2.2.0"
@@ -28,6 +29,8 @@ lazy val CommonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % CatsCoreV,
     "org.typelevel" %% "cats-effect" % CatsEffectV,
+    "org.typelevel" %% "log4cats-core" % Log4CatsV,
+    "org.typelevel" %% "log4cats-slf4j" % Log4CatsV,
     "co.fs2" %% "fs2-core" % Fs2V,
     "co.fs2" %% "fs2-io" % Fs2V,
     "co.fs2" %% "fs2-reactive-streams" % Fs2V,

@@ -1,14 +1,15 @@
 package io.mattmoore.store.user.services
 
-import cats.effect._
+import cats.effect.*
 import cats.effect.unsafe.implicits.global
 import com.dimafeng.testcontainers.munit.TestContainersForEach
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import doobie.util.transactor.Transactor
-import io.mattmoore.store.user.algebras._
-import io.mattmoore.store.user.repositories._
-import io.mattmoore.store.user.domain._
-import natchez.Trace.Implicits.noop
+import io.mattmoore.store.user.algebras.*
+import io.mattmoore.store.user.repositories.*
+import io.mattmoore.store.user.domain.*
+import natchez._
+import natchez.Trace.Implicits._
 
 import java.util.UUID
 import org.flywaydb.core.Flyway
@@ -29,6 +30,19 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
   }
 
   type F[A] = IO[A]
+
+  def entryPoint[F[_]: Sync]: Resource[F, EntryPoint[F]] = {
+    import natchez.jaeger.Jaeger
+    import io.jaegertracing.Configuration.SamplerConfiguration
+    import io.jaegertracing.Configuration.ReporterConfiguration
+    Jaeger.entryPoint[F]("UserService") { c =>
+      Sync[F].delay {
+        c.withSampler(new SamplerConfiguration().withType("const").withParam(1))
+          .withReporter(ReporterConfiguration.fromEnv)
+          .getTracer
+      }
+    }
+  }
 
   test("getUser returns a user for the ID") {
     withContainers { case psql =>
