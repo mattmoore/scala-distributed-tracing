@@ -12,11 +12,17 @@ import org.flywaydb.core.api.configuration.Configuration
 
 import java.util.UUID
 
+import scala.jdk.CollectionConverters._
+
 class UserRepositorySuite extends munit.FunSuite with TestContainersForEach {
   override type Containers = PostgreSQLContainer
 
   override def startContainers(): PostgreSQLContainer = {
-    val psql = PostgreSQLContainer.Def("postgres:14").start()
+    val psql = PostgreSQLContainer("postgres:14").configure { c =>
+      c.withExposedPorts(5432)
+      c.setPortBindings(List("5432:5432").asJava)
+    }
+    psql.start()
     val flyway = Flyway
       .configure()
       .mixed(true)

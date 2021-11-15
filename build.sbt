@@ -5,6 +5,7 @@ val CatsCoreV = "2.6.1"
 val CatsEffectV = "3.2.9"
 val Http4sV = "0.23.6"
 val CirceV = "0.14.1"
+val DeclineV = "2.2.0"
 val DoobieV = "1.0.0-RC1"
 val FlywayV = "8.0.2"
 val Fs2V = "3.2.2"
@@ -38,6 +39,7 @@ lazy val CommonSettings = Seq(
     "org.tpolecat" %% "doobie-postgres" % DoobieV,
     "org.flywaydb" % "flyway-core" % FlywayV,
     "ch.qos.logback" % "logback-classic" % LogbackV,
+    "com.monovore" %% "decline-effect" % DeclineV,
     "org.scalameta" %% "munit" % MunitV % Test,
     "org.typelevel" %% "munit-cats-effect-3" % MunitCatsEffectV % Test,
     "com.dimafeng" %% "testcontainers-scala-munit" % TestContainersV % "test,it",
