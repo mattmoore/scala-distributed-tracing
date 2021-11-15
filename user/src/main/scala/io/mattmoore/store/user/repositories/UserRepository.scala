@@ -6,12 +6,13 @@ import doobie.implicits._
 import doobie.postgres.implicits._
 import io.mattmoore.store.user.algebras._
 import io.mattmoore.store.user.domain.User
+import natchez.Trace
 
 import java.util.UUID
 
-class UserRepository[F[_]: Async: natchez.Trace](xa: Transactor[F])(implicit tracer: natchez.Trace[F]) extends Repository[F, User] {
+class UserRepository[F[_]: Async: Trace](xa: Transactor[F]) extends Repository[F, User] {
   override def query(id: UUID): F[User] =
-    tracer.span(s"Fetching user with ID $id from database.") {
+    Trace[F].span(s"Fetching user with ID $id from database.") {
       Queries
         .selectUser(id)
         .unique
@@ -19,7 +20,7 @@ class UserRepository[F[_]: Async: natchez.Trace](xa: Transactor[F])(implicit tra
     }
 
   override def insert(user: User): F[UUID] =
-    tracer.span(s"Insert new user $user") {
+    Trace[F].span(s"Insert new user $user") {
       Queries
         .insertUser(user)
         .withUniqueGeneratedKeys[UUID]("id")
@@ -27,7 +28,7 @@ class UserRepository[F[_]: Async: natchez.Trace](xa: Transactor[F])(implicit tra
     }
 
   override def update(user: User): F[UUID] =
-    tracer.span(s"Update user $user") {
+    Trace[F].span(s"Update user $user") {
       Queries
         .updateUser(user)
         .withUniqueGeneratedKeys[UUID]("id")
