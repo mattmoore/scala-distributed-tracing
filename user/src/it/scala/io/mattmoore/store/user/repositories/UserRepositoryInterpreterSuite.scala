@@ -1,22 +1,21 @@
-package io.mattmoore.store.product
+package io.mattmoore.store.user.repositories
 
 import cats.effect.*
 import cats.effect.unsafe.implicits.global
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import com.dimafeng.testcontainers.munit.TestContainersForEach
 import doobie.util.transactor.Transactor
-import io.mattmoore.store.product.algebras.*
-import io.mattmoore.store.product.domain.*
-import io.mattmoore.store.product.repositories.*
-import natchez.*
-import natchez.Trace.Implicits.*
+import io.mattmoore.store.user.algebras.*
+import io.mattmoore.store.user.domain.*
+import natchez._
+import natchez.Trace.Implicits._
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.Configuration
 
 import java.util.UUID
 import scala.jdk.CollectionConverters.*
 
-class ProductRepositorySuite extends munit.FunSuite with TestContainersForEach {
+class UserRepositoryInterpreterSuite extends munit.FunSuite with TestContainersForEach {
   override type Containers = PostgreSQLContainer
 
   override def startContainers(): PostgreSQLContainer = {
@@ -38,9 +37,10 @@ class ProductRepositorySuite extends munit.FunSuite with TestContainersForEach {
   type F[A] = IO[A]
 
   def entryPoint[F[_]: Sync]: Resource[F, EntryPoint[F]] = {
-    import io.jaegertracing.Configuration.{ReporterConfiguration, SamplerConfiguration}
     import natchez.jaeger.Jaeger
-    Jaeger.entryPoint[F]("ProductService") { c =>
+    import io.jaegertracing.Configuration.SamplerConfiguration
+    import io.jaegertracing.Configuration.ReporterConfiguration
+    Jaeger.entryPoint[F]("UserService") { c =>
       Sync[F].delay {
         c.withSampler(new SamplerConfiguration().withType("const").withParam(1))
           .withReporter(ReporterConfiguration.fromEnv)
@@ -49,9 +49,9 @@ class ProductRepositorySuite extends munit.FunSuite with TestContainersForEach {
     }
   }
 
-  test("getProduct returns a product for the ID") {
+  test("getUser returns a user for the ID") {
     withContainers { case psql =>
-      val userRepository: Repository[F, Product] = new ProductRepository(
+      val userRepository: Repository[F, User] = new UserRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -60,28 +60,30 @@ class ProductRepositorySuite extends munit.FunSuite with TestContainersForEach {
         )
       )
 
-      val productToAdd = Product(
-        name = "Playstation 5",
-        description = "Playstation 5",
-        price = BigDecimal(499.99)
+      val userToAdd = User(
+        firstName = "Matt",
+        lastName = "Moore",
+        email = "matt@mattmoore.io",
+        address = "123 Anywhere Street, Chicago, IL"
       )
 
-      val dbUserId = userRepository.insert(productToAdd).unsafeRunSync()
+      val dbUserId = userRepository.insert(userToAdd).unsafeRunSync()
 
-      val expected = Product(
+      val expected = User(
         id = Some(dbUserId),
-        name = "Playstation 5",
-        description = "Playstation 5",
-        price = BigDecimal(499.99)
+        firstName = "Matt",
+        lastName = "Moore",
+        email = "matt@mattmoore.io",
+        address = "123 Anywhere Street, Chicago, IL"
       )
       val actual = userRepository.query(dbUserId).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }
 
-  test("addProduct adds a product and returns the new ID") {
+  test("addUser adds a user and returns the new user's ID") {
     withContainers { case psql =>
-      val productRepository: Repository[F, Product] = new ProductRepository(
+      val userRepository: Repository[F, User] = new UserRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -89,20 +91,21 @@ class ProductRepositorySuite extends munit.FunSuite with TestContainersForEach {
           psql.container.getPassword
         )
       )
-      val productToAdd = Product(
+      val userToAdd = User(
         id = Some(UUID.fromString("32fe8628-4182-4900-9e52-b3c5304f97da")),
-        name = "Playstation 5",
-        description = "Playstation 5",
-        price = BigDecimal(499.99)
+        firstName = "Matt",
+        lastName = "Moore",
+        email = "matt@mattmoore.io",
+        address = "123 Anywhere Street, Chicago, IL"
       )
-      val actual = productRepository.insert(productToAdd).unsafeRunSync()
+      val actual = userRepository.insert(userToAdd).unsafeRunSync()
       assert(!actual.toString.isEmpty)
     }
   }
 
-  test("updateProduct updates an existing product and returns the updated record") {
+  test("updateUser updates an existing user and returns the updated user record") {
     withContainers { case psql =>
-      val productRepository: Repository[F, Product] = new ProductRepository(
+      val userRepository: Repository[F, User] = new UserRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -110,19 +113,21 @@ class ProductRepositorySuite extends munit.FunSuite with TestContainersForEach {
           psql.container.getPassword
         )
       )
-      val initialProduct = Product(
-        name = "Playstation 5",
-        description = "Playstation 5",
-        price = BigDecimal(499.99)
+      val initialUser = User(
+        firstName = "Matt",
+        lastName = "Moore",
+        email = "matt@mattmoore.io",
+        address = "123 Anywhere Street, Chicago, IL"
       )
-      val productUpdate = Product(
-        name = "Playstation 5",
-        description = "Playstation 5",
-        price = BigDecimal(1000)
+      val userUpdate = User(
+        firstName = "Matthew",
+        lastName = "Moore",
+        email = "matt@mattmoore.io",
+        address = "123 Anywhere Street, Chicago, IL"
       )
 
-      val expected = productRepository.insert(initialProduct).unsafeRunSync()
-      val actual = productRepository.update(productUpdate).unsafeRunSync()
+      val expected = userRepository.insert(initialUser).unsafeRunSync()
+      val actual = userRepository.update(userUpdate).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }

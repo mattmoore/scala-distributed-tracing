@@ -44,7 +44,7 @@ object Main extends IOApp {
             .dataSource("jdbc:postgresql:users", "postgres", "password")
             .load()
             .migrate()
-          val productRepository: Repository[F, Product] = new ProductRepository(xa)
+          val productRepository: Repository[F, Product] = new ProductRepositoryInterpreter(xa)
           val productService: ProductService[F, Product] = new ProductServiceInterpreter[F, Product](productRepository)
 
           val consumerSettings =

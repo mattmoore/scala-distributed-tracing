@@ -10,7 +10,7 @@ import natchez.Trace
 
 import java.util.UUID
 
-class UserRepository[F[_]: Async: Trace](xa: Transactor[F]) extends Repository[F, User] {
+class UserRepositoryInterpreter[F[_]: Async: Trace](xa: Transactor[F]) extends Repository[F, User] {
   override def query(id: UUID): F[User] =
     Trace[F].span(s"Fetching user with ID $id from database.") {
       Queries

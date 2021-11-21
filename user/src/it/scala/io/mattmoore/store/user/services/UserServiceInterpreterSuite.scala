@@ -46,7 +46,7 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
 
   test("getUser returns a user for the ID") {
     withContainers { case psql =>
-      val userRepository: Repository[F, User] = new UserRepository(
+      val userRepository: Repository[F, User] = new UserRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -79,7 +79,7 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
 
   test("addUser adds a user and returns the updated user record") {
     withContainers { case psql =>
-      val userRepository: Repository[F, User] = new UserRepository(
+      val userRepository: Repository[F, User] = new UserRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -102,7 +102,7 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
 
   test("updateUser updates an existing user and returns the updated user record") {
     withContainers { case psql =>
-      val userRepository: Repository[F, User] = new UserRepository(
+      val userRepository: Repository[F, User] = new UserRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
