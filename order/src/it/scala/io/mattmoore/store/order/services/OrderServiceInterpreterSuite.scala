@@ -44,7 +44,7 @@ class OrderServiceInterpreterSuite extends munit.FunSuite with TestContainersFor
     }
   }
 
-  test("getOrder returns an order for the ID") {
+  test("get returns an order for the ID") {
     withContainers { case psql =>
       val repository: Repository[F, Order] = new OrderRepositoryInterpreter(
         Transactor.fromDriverManager[F](
@@ -61,19 +61,19 @@ class OrderServiceInterpreterSuite extends munit.FunSuite with TestContainersFor
         productId = UUID.fromString("ca81d811-befe-4e44-9e59-e5260598a22d")
       )
 
-      val dbOrderId = orderService.addOrder(orderToAdd).unsafeRunSync()
+      val dbOrderId = orderService.add(orderToAdd).unsafeRunSync()
 
       val expected = Order(
         id = Some(dbOrderId),
         userId = UUID.fromString("c9ef06bb-940e-4aef-b0ac-0d603d1b50d8"),
         productId = UUID.fromString("ca81d811-befe-4e44-9e59-e5260598a22d")
       )
-      val actual = orderService.getOrder(dbOrderId).unsafeRunSync()
+      val actual = orderService.get(dbOrderId).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }
 
-  test("addOrder adds an order and returns the updated record") {
+  test("add adds an order and returns the updated record") {
     withContainers { case psql =>
       val repository: Repository[F, Order] = new OrderRepositoryInterpreter(
         Transactor.fromDriverManager[F](
@@ -89,12 +89,12 @@ class OrderServiceInterpreterSuite extends munit.FunSuite with TestContainersFor
         userId = UUID.fromString("c9ef06bb-940e-4aef-b0ac-0d603d1b50d8"),
         productId = UUID.fromString("ca81d811-befe-4e44-9e59-e5260598a22d")
       )
-      val actual = service.addOrder(orderToAdd).unsafeRunSync()
+      val actual = service.add(orderToAdd).unsafeRunSync()
       assert(!actual.toString.isEmpty)
     }
   }
 
-  test("updateOrder updates an existing order and returns the updated record") {
+  test("update updates an existing order and returns the updated record") {
     withContainers { case psql =>
       val repository: Repository[F, Order] = new OrderRepositoryInterpreter(
         Transactor.fromDriverManager[F](
@@ -115,8 +115,8 @@ class OrderServiceInterpreterSuite extends munit.FunSuite with TestContainersFor
         productId = UUID.fromString("ca81d811-befe-4e44-9e59-e5260598a22d")
       )
 
-      val expected = service.addOrder(initial).unsafeRunSync()
-      val actual = service.updateOrder(update.copy(id = Some(expected))).unsafeRunSync()
+      val expected = service.add(initial).unsafeRunSync()
+      val actual = service.update(update.copy(id = Some(expected))).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }

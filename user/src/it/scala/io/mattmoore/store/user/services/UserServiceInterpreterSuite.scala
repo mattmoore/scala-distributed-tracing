@@ -44,7 +44,7 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
     }
   }
 
-  test("getUser returns a user for the ID") {
+  test("get returns a user for the ID") {
     withContainers { case psql =>
       val userRepository: Repository[F, User] = new UserRepositoryInterpreter(
         Transactor.fromDriverManager[F](
@@ -63,7 +63,7 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
         address = "123 Anywhere Street, Chicago, IL"
       )
 
-      val dbUserId = userService.addUser(userToAdd).unsafeRunSync()
+      val dbUserId = userService.add(userToAdd).unsafeRunSync()
 
       val expected = User(
         id = Some(dbUserId),
@@ -72,12 +72,12 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
         email = "matt@mattmoore.io",
         address = "123 Anywhere Street, Chicago, IL"
       )
-      val actual = userService.getUser(dbUserId).unsafeRunSync()
+      val actual = userService.get(dbUserId).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }
 
-  test("addUser adds a user and returns the updated user record") {
+  test("add adds a user and returns the updated user record") {
     withContainers { case psql =>
       val userRepository: Repository[F, User] = new UserRepositoryInterpreter(
         Transactor.fromDriverManager[F](
@@ -95,12 +95,12 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
         email = "matt@mattmoore.io",
         address = "123 Anywhere Street, Chicago, IL"
       )
-      val actual = userService.addUser(userToAdd).unsafeRunSync()
+      val actual = userService.add(userToAdd).unsafeRunSync()
       assert(!actual.toString.isEmpty)
     }
   }
 
-  test("updateUser updates an existing user and returns the updated user record") {
+  test("update updates an existing user and returns the updated user record") {
     withContainers { case psql =>
       val userRepository: Repository[F, User] = new UserRepositoryInterpreter(
         Transactor.fromDriverManager[F](
@@ -125,8 +125,8 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
         address = "123 Anywhere Street, Chicago, IL"
       )
 
-      val expected = userService.addUser(initialUser).unsafeRunSync()
-      val actual = userService.updateUser(userUpdate.copy(id = Some(expected))).unsafeRunSync()
+      val expected = userService.add(initialUser).unsafeRunSync()
+      val actual = userService.update(userUpdate.copy(id = Some(expected))).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }

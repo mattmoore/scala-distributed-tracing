@@ -43,7 +43,7 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
     }
   }
 
-  test("getProduct returns a product for the ID") {
+  test("get returns a product for the ID") {
     withContainers { case psql =>
       val repository: Repository[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
@@ -61,7 +61,7 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
         price = BigDecimal(499.99)
       )
 
-      val dbProductId = service.addProduct(productToAdd).unsafeRunSync()
+      val dbProductId = service.add(productToAdd).unsafeRunSync()
 
       val expected = Product(
         id = Some(dbProductId),
@@ -69,12 +69,12 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
         description = "Playstation 5",
         price = BigDecimal(499.99)
       )
-      val actual = service.getProduct(dbProductId).unsafeRunSync()
+      val actual = service.get(dbProductId).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }
 
-  test("addProduct adds a product and returns the updated product record") {
+  test("add adds a product and returns the updated product record") {
     withContainers { case psql =>
       val repository: Repository[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
@@ -91,12 +91,12 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
         description = "Playstation 5",
         price = BigDecimal(499.99)
       )
-      val actual = service.addProduct(productToAdd).unsafeRunSync()
+      val actual = service.add(productToAdd).unsafeRunSync()
       assert(!actual.toString.isEmpty)
     }
   }
 
-  test("updateProduct updates an existing product and returns the updated product record") {
+  test("update updates an existing product and returns the updated product record") {
     withContainers { case psql =>
       val repository: Repository[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
@@ -119,8 +119,8 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
         price = BigDecimal(1000)
       )
 
-      val expected = service.addProduct(initialProduct).unsafeRunSync()
-      val actual = service.updateProduct(productUpdate.copy(id = Some(expected))).unsafeRunSync()
+      val expected = service.add(initialProduct).unsafeRunSync()
+      val actual = service.update(productUpdate.copy(id = Some(expected))).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }

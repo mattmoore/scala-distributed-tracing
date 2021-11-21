@@ -5,7 +5,7 @@ import io.mattmoore.store.product.domain._
 import java.util.UUID
 
 trait ProductService[F[_]] {
-  def getProduct(id: UUID): F[Product]
-  def addProduct(product: Product): F[UUID]
-  def updateProduct(product: Product): F[UUID]
+  def get(id: UUID): F[Product]
+  def add(product: Product): F[UUID]
+  def update(product: Product): F[UUID]
 }

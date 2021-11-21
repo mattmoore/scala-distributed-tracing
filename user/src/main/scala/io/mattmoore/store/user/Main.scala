@@ -58,7 +58,7 @@ object Main extends IOApp {
           KafkaConsumer.stream(consumerSettings)
 
           userService
-            .addUser(
+            .add(
               User(
                 firstName = "Matt",
                 lastName = "Moore",

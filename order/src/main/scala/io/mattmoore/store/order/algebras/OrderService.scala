@@ -5,7 +5,7 @@ import io.mattmoore.store.order.domain._
 import java.util.UUID
 
 trait OrderService[F[_]] {
-  def getOrder(id: UUID): F[Order]
-  def addOrder(product: Order): F[UUID]
-  def updateOrder(product: Order): F[UUID]
+  def get(id: UUID): F[Order]
+  def add(product: Order): F[UUID]
+  def update(product: Order): F[UUID]
 }
