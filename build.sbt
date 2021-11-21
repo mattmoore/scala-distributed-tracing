@@ -22,6 +22,10 @@ lazy val root = project
   .settings(
     name := "store"
   )
+  .aggregate(
+    user,
+    product
+  )
 
 lazy val CommonSettings = Seq(
   scalaVersion := scalaV3,
@@ -45,7 +49,7 @@ lazy val CommonSettings = Seq(
     "ch.qos.logback" % "logback-classic" % LogbackV,
     "com.monovore" %% "decline-effect" % DeclineV,
     "org.scalameta" %% "munit" % MunitV % Test,
-    "org.typelevel" %% "munit-cats-effect-3" % MunitCatsEffectV % Test,
+    "org.typelevel" %% "munit-cats-effect-3" % MunitCatsEffectV % "test,it",
     "com.dimafeng" %% "testcontainers-scala-munit" % TestContainersV % "test,it",
     "com.dimafeng" %% "testcontainers-scala-postgresql" % TestContainersV % "test,it"
   )

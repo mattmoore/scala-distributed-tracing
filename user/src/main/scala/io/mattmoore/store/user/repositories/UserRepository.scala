@@ -1,11 +1,11 @@
 package io.mattmoore.store.user.repositories
 
-import cats.effect._
-import doobie._
-import doobie.implicits._
-import doobie.postgres.implicits._
-import io.mattmoore.store.user.algebras._
-import io.mattmoore.store.user.domain.User
+import cats.effect.*
+import doobie.*
+import doobie.implicits.*
+import doobie.postgres.implicits.*
+import io.mattmoore.store.user.algebras.*
+import io.mattmoore.store.user.domain.*
 import natchez.Trace
 
 import java.util.UUID
