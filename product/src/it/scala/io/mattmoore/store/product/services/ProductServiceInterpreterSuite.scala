@@ -1,4 +1,4 @@
-package io.mattmoore.store.product
+package io.mattmoore.store.product.services
 
 import cats.effect.*
 import cats.effect.unsafe.implicits.global
@@ -11,20 +11,14 @@ import io.mattmoore.store.product.repositories.*
 import natchez.*
 import natchez.Trace.Implicits.*
 import org.flywaydb.core.Flyway
-import org.flywaydb.core.api.configuration.Configuration
 
 import java.util.UUID
-import scala.jdk.CollectionConverters.*
 
-class ProductRepositoryInterpreterSuite extends munit.FunSuite with TestContainersForEach {
+class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersForEach {
   override type Containers = PostgreSQLContainer
 
   override def startContainers(): PostgreSQLContainer = {
-    val psql = PostgreSQLContainer("postgres:14").configure { c =>
-      c.withExposedPorts(5432)
-      c.setPortBindings(List("5432:5432").asJava)
-    }
-    psql.start()
+    val psql = PostgreSQLContainer.Def("postgres:14").start()
     val flyway = Flyway
       .configure()
       .mixed(true)
@@ -59,6 +53,7 @@ class ProductRepositoryInterpreterSuite extends munit.FunSuite with TestContaine
           psql.container.getPassword
         )
       )
+      val productService: ProductService[F] = new ProductServiceInterpreter[F](userRepository)
 
       val productToAdd = Product(
         name = "Playstation 5",
@@ -66,22 +61,22 @@ class ProductRepositoryInterpreterSuite extends munit.FunSuite with TestContaine
         price = BigDecimal(499.99)
       )
 
-      val dbUserId = userRepository.insert(productToAdd).unsafeRunSync()
+      val dbProductId = productService.addProduct(productToAdd).unsafeRunSync()
 
       val expected = Product(
-        id = Some(dbUserId),
+        id = Some(dbProductId),
         name = "Playstation 5",
         description = "Playstation 5",
         price = BigDecimal(499.99)
       )
-      val actual = userRepository.query(dbUserId).unsafeRunSync()
+      val actual = productService.getProduct(dbProductId).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }
 
-  test("addProduct adds a product and returns the new ID") {
+  test("addUser adds a user and returns the updated user record") {
     withContainers { case psql =>
-      val productRepository: Repository[F, Product] = new ProductRepositoryInterpreter(
+      val userRepository: Repository[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -89,18 +84,19 @@ class ProductRepositoryInterpreterSuite extends munit.FunSuite with TestContaine
           psql.container.getPassword
         )
       )
+      val productService: ProductService[F] = new ProductServiceInterpreter[F](userRepository)
       val productToAdd = Product(
         id = Some(UUID.fromString("32fe8628-4182-4900-9e52-b3c5304f97da")),
         name = "Playstation 5",
         description = "Playstation 5",
         price = BigDecimal(499.99)
       )
-      val actual = productRepository.insert(productToAdd).unsafeRunSync()
+      val actual = productService.addProduct(productToAdd).unsafeRunSync()
       assert(!actual.toString.isEmpty)
     }
   }
 
-  test("updateProduct updates an existing product and returns the updated record") {
+  test("updateUser updates an existing user and returns the updated user record") {
     withContainers { case psql =>
       val productRepository: Repository[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
@@ -110,6 +106,8 @@ class ProductRepositoryInterpreterSuite extends munit.FunSuite with TestContaine
           psql.container.getPassword
         )
       )
+      val productService: ProductService[F] = new ProductServiceInterpreter[F](productRepository)
+
       val initialProduct = Product(
         name = "Playstation 5",
         description = "Playstation 5",
@@ -121,8 +119,8 @@ class ProductRepositoryInterpreterSuite extends munit.FunSuite with TestContaine
         price = BigDecimal(1000)
       )
 
-      val expected = productRepository.insert(initialProduct).unsafeRunSync()
-      val actual = productRepository.update(productUpdate).unsafeRunSync()
+      val expected = productService.addProduct(initialProduct).unsafeRunSync()
+      val actual = productService.updateProduct(productUpdate.copy(id = Some(expected))).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }

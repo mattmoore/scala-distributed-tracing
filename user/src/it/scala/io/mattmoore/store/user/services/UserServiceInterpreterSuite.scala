@@ -126,7 +126,7 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
       )
 
       val expected = userService.addUser(initialUser).unsafeRunSync()
-      val actual = userService.updateUser(userUpdate).unsafeRunSync()
+      val actual = userService.updateUser(userUpdate.copy(id = Some(expected))).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }

@@ -45,7 +45,7 @@ object Main extends IOApp {
             .load()
             .migrate()
           val productRepository: Repository[F, Product] = new ProductRepositoryInterpreter(xa)
-          val productService: ProductService[F, Product] = new ProductServiceInterpreter[F, Product](productRepository)
+          val productService: ProductService[F] = new ProductServiceInterpreter[F](productRepository)
 
           val consumerSettings =
             ConsumerSettings[F, String, String]
