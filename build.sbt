@@ -88,3 +88,20 @@ lazy val product = project
   )
   .configs(IntegrationTest)
   .settings(Defaults.itSettings)
+
+lazy val order = project
+  .settings(CommonSettings)
+  .settings(
+    name := "order",
+    version := "0.1.0",
+    libraryDependencies ++= Seq(
+      "org.http4s" %% "http4s-blaze-server" % Http4sV,
+      "org.http4s" %% "http4s-blaze-client" % Http4sV,
+      "org.http4s" %% "http4s-circe" % Http4sV,
+      "org.http4s" %% "http4s-dsl" % Http4sV,
+      "io.circe" %% "circe-generic" % CirceV
+    ),
+    fork := true
+  )
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings)

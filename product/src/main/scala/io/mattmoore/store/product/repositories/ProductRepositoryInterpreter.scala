@@ -12,7 +12,7 @@ import java.util.UUID
 
 class ProductRepositoryInterpreter[F[_]: Async: Trace](xa: Transactor[F]) extends Repository[F, Product] {
   override def query(id: UUID): F[Product] =
-    Trace[F].span(s"Fetching user with ID $id from database.") {
+    Trace[F].span(s"Fetching product with ID $id from database.") {
       Queries
         .selectProduct(id)
         .unique

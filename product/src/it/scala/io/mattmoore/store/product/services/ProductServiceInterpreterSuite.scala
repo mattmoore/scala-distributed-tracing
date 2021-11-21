@@ -45,7 +45,7 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
 
   test("getProduct returns a product for the ID") {
     withContainers { case psql =>
-      val userRepository: Repository[F, Product] = new ProductRepositoryInterpreter(
+      val repository: Repository[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -53,7 +53,7 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
           psql.container.getPassword
         )
       )
-      val productService: ProductService[F] = new ProductServiceInterpreter[F](userRepository)
+      val service: ProductService[F] = new ProductServiceInterpreter[F](repository)
 
       val productToAdd = Product(
         name = "Playstation 5",
@@ -61,7 +61,7 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
         price = BigDecimal(499.99)
       )
 
-      val dbProductId = productService.addProduct(productToAdd).unsafeRunSync()
+      val dbProductId = service.addProduct(productToAdd).unsafeRunSync()
 
       val expected = Product(
         id = Some(dbProductId),
@@ -69,14 +69,14 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
         description = "Playstation 5",
         price = BigDecimal(499.99)
       )
-      val actual = productService.getProduct(dbProductId).unsafeRunSync()
+      val actual = service.getProduct(dbProductId).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }
 
-  test("addUser adds a user and returns the updated user record") {
+  test("addProduct adds a product and returns the updated product record") {
     withContainers { case psql =>
-      val userRepository: Repository[F, Product] = new ProductRepositoryInterpreter(
+      val repository: Repository[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -84,21 +84,21 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
           psql.container.getPassword
         )
       )
-      val productService: ProductService[F] = new ProductServiceInterpreter[F](userRepository)
+      val service: ProductService[F] = new ProductServiceInterpreter[F](repository)
       val productToAdd = Product(
         id = Some(UUID.fromString("32fe8628-4182-4900-9e52-b3c5304f97da")),
         name = "Playstation 5",
         description = "Playstation 5",
         price = BigDecimal(499.99)
       )
-      val actual = productService.addProduct(productToAdd).unsafeRunSync()
+      val actual = service.addProduct(productToAdd).unsafeRunSync()
       assert(!actual.toString.isEmpty)
     }
   }
 
-  test("updateUser updates an existing user and returns the updated user record") {
+  test("updateProduct updates an existing product and returns the updated product record") {
     withContainers { case psql =>
-      val productRepository: Repository[F, Product] = new ProductRepositoryInterpreter(
+      val repository: Repository[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -106,7 +106,7 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
           psql.container.getPassword
         )
       )
-      val productService: ProductService[F] = new ProductServiceInterpreter[F](productRepository)
+      val service: ProductService[F] = new ProductServiceInterpreter[F](repository)
 
       val initialProduct = Product(
         name = "Playstation 5",
@@ -119,8 +119,8 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
         price = BigDecimal(1000)
       )
 
-      val expected = productService.addProduct(initialProduct).unsafeRunSync()
-      val actual = productService.updateProduct(productUpdate.copy(id = Some(expected))).unsafeRunSync()
+      val expected = service.addProduct(initialProduct).unsafeRunSync()
+      val actual = service.updateProduct(productUpdate.copy(id = Some(expected))).unsafeRunSync()
       assertEquals(actual, expected)
     }
   }

@@ -1,4 +1,4 @@
-package io.mattmoore.store.user.algebras
+package io.mattmoore.store.order.algebras
 
 import java.util.UUID
 
