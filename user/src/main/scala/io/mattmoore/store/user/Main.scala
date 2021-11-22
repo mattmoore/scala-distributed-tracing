@@ -16,18 +16,6 @@ import org.flywaydb.core.Flyway
 object Main extends IOApp {
   type F[A] = IO[A]
 
-  def entryPoint[F[_]: Sync]: Resource[F, EntryPoint[F]] = {
-    import io.jaegertracing.Configuration.{ReporterConfiguration, SamplerConfiguration}
-    import natchez.jaeger.Jaeger
-    Jaeger.entryPoint[F]("UserService") { c =>
-      Sync[F].delay {
-        c.withSampler(new SamplerConfiguration().withType("const").withParam(1))
-          .withReporter(ReporterConfiguration.fromEnv)
-          .getTracer
-      }
-    }
-  }
-
   override def run(args: List[String]): F[ExitCode] = {
     entryPoint[F].use { ep =>
       ep.root("Starting the app").use { span =>
@@ -74,6 +62,18 @@ object Main extends IOApp {
             .drain
             .as(ExitCode.Success)
         }
+      }
+    }
+  }
+
+  private def entryPoint[F[_]: Sync]: Resource[F, EntryPoint[F]] = {
+    import io.jaegertracing.Configuration.{ReporterConfiguration, SamplerConfiguration}
+    import natchez.jaeger.Jaeger
+    Jaeger.entryPoint[F]("UserService") { c =>
+      Sync[F].delay {
+        c.withSampler(new SamplerConfiguration().withType("const").withParam(1))
+          .withReporter(ReporterConfiguration.fromEnv)
+          .getTracer
       }
     }
   }

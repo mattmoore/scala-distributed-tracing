@@ -60,15 +60,7 @@ lazy val algebras = project
   .settings(CommonSettings)
   .settings(
     name := "algebras",
-    version := "0.1.0",
-    libraryDependencies ++= Seq(
-      "org.http4s" %% "http4s-blaze-server" % Http4sV,
-      "org.http4s" %% "http4s-blaze-client" % Http4sV,
-      "org.http4s" %% "http4s-circe" % Http4sV,
-      "org.http4s" %% "http4s-dsl" % Http4sV,
-      "io.circe" %% "circe-generic" % CirceV
-    ),
-    fork := true
+    version := "0.1.0"
   )
   .configs(IntegrationTest)
   .settings(Defaults.itSettings)
