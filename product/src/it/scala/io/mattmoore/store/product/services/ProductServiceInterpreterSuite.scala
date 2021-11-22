@@ -54,7 +54,7 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
           psql.container.getPassword
         )
       )
-      val service: ProductService[F] = new ProductServiceInterpreter[F](repository)
+      val service: ProductServiceAlgebra[F] = new ProductServiceInterpreter[F](repository)
 
       val productToAdd = Product(
         name = "Playstation 5",
@@ -85,7 +85,7 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
           psql.container.getPassword
         )
       )
-      val service: ProductService[F] = new ProductServiceInterpreter[F](repository)
+      val service: ProductServiceAlgebra[F] = new ProductServiceInterpreter[F](repository)
       val productToAdd = Product(
         id = Some(UUID.fromString("32fe8628-4182-4900-9e52-b3c5304f97da")),
         name = "Playstation 5",
@@ -107,7 +107,7 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
           psql.container.getPassword
         )
       )
-      val service: ProductService[F] = new ProductServiceInterpreter[F](repository)
+      val service: ProductServiceAlgebra[F] = new ProductServiceInterpreter[F](repository)
 
       val initialProduct = Product(
         name = "Playstation 5",

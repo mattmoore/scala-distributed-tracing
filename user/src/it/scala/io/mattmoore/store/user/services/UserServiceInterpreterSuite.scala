@@ -55,7 +55,7 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
           psql.container.getPassword
         )
       )
-      val userService: UserService[F] = new UserServiceInterpreter[F](userRepository)
+      val userService: UserServiceAlgebra[F] = new UserServiceInterpreter[F](userRepository)
 
       val userToAdd = User(
         firstName = "Matt",
@@ -88,7 +88,7 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
           psql.container.getPassword
         )
       )
-      val userService: UserService[F] = new UserServiceInterpreter[F](userRepository)
+      val userService: UserServiceAlgebra[F] = new UserServiceInterpreter[F](userRepository)
       val userToAdd = User(
         id = Some(UUID.fromString("32fe8628-4182-4900-9e52-b3c5304f97da")),
         firstName = "Matt",
@@ -111,7 +111,7 @@ class UserServiceInterpreterSuite extends munit.FunSuite with TestContainersForE
           psql.container.getPassword
         )
       )
-      val userService: UserService[F] = new UserServiceInterpreter[F](userRepository)
+      val userService: UserServiceAlgebra[F] = new UserServiceInterpreter[F](userRepository)
 
       val initialUser = User(
         firstName = "Matt",

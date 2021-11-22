@@ -47,7 +47,7 @@ object Main extends IOApp {
             .load()
             .migrate()
           val orderRepository: RepositoryAlgebra[F, Order] = new OrderRepositoryInterpreter(xa)
-          val orderService: OrderService[F] = new OrderServiceInterpreter[F](orderRepository)
+          val orderService: OrderServiceAlgebra[F] = new OrderServiceInterpreter[F](orderRepository)
 
           val consumerSettings =
             ConsumerSettings[F, String, String]

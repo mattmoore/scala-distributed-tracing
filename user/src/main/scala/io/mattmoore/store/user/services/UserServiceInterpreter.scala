@@ -8,7 +8,7 @@ import natchez.Trace
 
 import java.util.UUID
 
-class UserServiceInterpreter[F[_]: Async: Trace](repository: RepositoryAlgebra[F, User]) extends UserService[F] {
+class UserServiceInterpreter[F[_]: Async: Trace](repository: RepositoryAlgebra[F, User]) extends UserServiceAlgebra[F] {
   override def get(id: UUID): F[User] =
     Trace[F].span(s"Get user with ID $id") {
       repository.query(id)

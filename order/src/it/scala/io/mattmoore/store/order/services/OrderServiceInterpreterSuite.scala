@@ -55,7 +55,7 @@ class OrderServiceInterpreterSuite extends munit.FunSuite with TestContainersFor
           psql.container.getPassword
         )
       )
-      val orderService: OrderService[F] = new OrderServiceInterpreter[F](repository)
+      val orderService: OrderServiceAlgebra[F] = new OrderServiceInterpreter[F](repository)
 
       val orderToAdd = Order(
         userId = UUID.fromString("c9ef06bb-940e-4aef-b0ac-0d603d1b50d8"),
@@ -84,7 +84,7 @@ class OrderServiceInterpreterSuite extends munit.FunSuite with TestContainersFor
           psql.container.getPassword
         )
       )
-      val service: OrderService[F] = new OrderServiceInterpreter[F](repository)
+      val service: OrderServiceAlgebra[F] = new OrderServiceInterpreter[F](repository)
       val orderToAdd = Order(
         id = Some(UUID.fromString("32fe8628-4182-4900-9e52-b3c5304f97da")),
         userId = UUID.fromString("c9ef06bb-940e-4aef-b0ac-0d603d1b50d8"),
@@ -105,7 +105,7 @@ class OrderServiceInterpreterSuite extends munit.FunSuite with TestContainersFor
           psql.container.getPassword
         )
       )
-      val service: OrderService[F] = new OrderServiceInterpreter[F](repository)
+      val service: OrderServiceAlgebra[F] = new OrderServiceInterpreter[F](repository)
 
       val initial = Order(
         userId = UUID.fromString("c9ef06bb-940e-4aef-b0ac-0d603d1b50d8"),

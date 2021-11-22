@@ -48,7 +48,7 @@ object Main extends IOApp {
             .load()
             .migrate()
           val userRepository: RepositoryAlgebra[F, User] = new UserRepositoryInterpreter(xa)
-          val userService: UserService[F] = new UserServiceInterpreter[F](userRepository)
+          val userService: UserServiceAlgebra[F] = new UserServiceInterpreter[F](userRepository)
 
           val consumerSettings =
             ConsumerSettings[F, String, String]
