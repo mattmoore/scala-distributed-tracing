@@ -1,13 +1,14 @@
 package io.mattmoore.store.user.services
 
-import cats.effect._
-import io.mattmoore.store.user.algebras._
-import io.mattmoore.store.user.domain._
+import cats.effect.*
+import io.mattmoore.store.algebras.*
+import io.mattmoore.store.user.algebras.*
+import io.mattmoore.store.user.domain.*
 import natchez.Trace
 
 import java.util.UUID
 
-class UserServiceInterpreter[F[_]: Async: Trace](repository: Repository[F, User]) extends UserService[F] {
+class UserServiceInterpreter[F[_]: Async: Trace](repository: RepositoryAlgebra[F, User]) extends UserService[F] {
   override def get(id: UUID): F[User] =
     Trace[F].span(s"Get user with ID $id") {
       repository.query(id)

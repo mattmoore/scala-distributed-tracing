@@ -1,15 +1,16 @@
 package io.mattmoore.store.user
 
-import cats.effect._
-import com.monovore.decline._
-import com.monovore.decline.effect._
-import doobie._
-import fs2.kafka._
-import io.mattmoore.store.user.algebras._
-import io.mattmoore.store.user.domain._
-import io.mattmoore.store.user.repositories._
-import io.mattmoore.store.user.services._
-import natchez._
+import cats.effect.*
+import com.monovore.decline.*
+import com.monovore.decline.effect.*
+import doobie.*
+import fs2.kafka.*
+import io.mattmoore.store.algebras.*
+import io.mattmoore.store.user.algebras.*
+import io.mattmoore.store.user.domain.*
+import io.mattmoore.store.user.repositories.*
+import io.mattmoore.store.user.services.*
+import natchez.*
 import org.flywaydb.core.Flyway
 
 object Main extends IOApp {
@@ -46,7 +47,7 @@ object Main extends IOApp {
             .dataSource("jdbc:postgresql:users", "postgres", "password")
             .load()
             .migrate()
-          val userRepository: Repository[F, User] = new UserRepositoryInterpreter(xa)
+          val userRepository: RepositoryAlgebra[F, User] = new UserRepositoryInterpreter(xa)
           val userService: UserService[F] = new UserServiceInterpreter[F](userRepository)
 
           val consumerSettings =

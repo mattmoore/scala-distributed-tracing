@@ -4,13 +4,13 @@ import cats.effect.*
 import doobie.*
 import doobie.implicits.*
 import doobie.postgres.implicits.*
-import io.mattmoore.store.order.algebras.*
+import io.mattmoore.store.algebras.*
 import io.mattmoore.store.order.domain.*
 import natchez.Trace
 
 import java.util.UUID
 
-class OrderRepositoryInterpreter[F[_]: Async: Trace](xa: Transactor[F]) extends Repository[F, Order] {
+class OrderRepositoryInterpreter[F[_]: Async: Trace](xa: Transactor[F]) extends RepositoryAlgebra[F, Order] {
   override def query(id: UUID): F[Order] =
     Trace[F].span(s"Fetching order with ID $id from database.") {
       Queries

@@ -5,10 +5,11 @@ import cats.effect.unsafe.implicits.global
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import com.dimafeng.testcontainers.munit.TestContainersForEach
 import doobie.util.transactor.Transactor
+import io.mattmoore.store.algebras.*
 import io.mattmoore.store.user.algebras.*
 import io.mattmoore.store.user.domain.*
-import natchez._
-import natchez.Trace.Implicits._
+import natchez.*
+import natchez.Trace.Implicits.*
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.Configuration
 
@@ -51,7 +52,7 @@ class UserRepositoryInterpreterSuite extends munit.FunSuite with TestContainersF
 
   test("getUser returns a user for the ID") {
     withContainers { case psql =>
-      val userRepository: Repository[F, User] = new UserRepositoryInterpreter(
+      val userRepository: RepositoryAlgebra[F, User] = new UserRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -83,7 +84,7 @@ class UserRepositoryInterpreterSuite extends munit.FunSuite with TestContainersF
 
   test("addUser adds a user and returns the new user's ID") {
     withContainers { case psql =>
-      val userRepository: Repository[F, User] = new UserRepositoryInterpreter(
+      val userRepository: RepositoryAlgebra[F, User] = new UserRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -105,7 +106,7 @@ class UserRepositoryInterpreterSuite extends munit.FunSuite with TestContainersF
 
   test("updateUser updates an existing user and returns the updated user record") {
     withContainers { case psql =>
-      val userRepository: Repository[F, User] = new UserRepositoryInterpreter(
+      val userRepository: RepositoryAlgebra[F, User] = new UserRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",

@@ -23,6 +23,7 @@ lazy val root = project
     name := "store"
   )
   .aggregate(
+    algebras,
     user,
     product
   )
@@ -55,6 +56,23 @@ lazy val CommonSettings = Seq(
   )
 )
 
+lazy val algebras = project
+  .settings(CommonSettings)
+  .settings(
+    name := "algebras",
+    version := "0.1.0",
+    libraryDependencies ++= Seq(
+      "org.http4s" %% "http4s-blaze-server" % Http4sV,
+      "org.http4s" %% "http4s-blaze-client" % Http4sV,
+      "org.http4s" %% "http4s-circe" % Http4sV,
+      "org.http4s" %% "http4s-dsl" % Http4sV,
+      "io.circe" %% "circe-generic" % CirceV
+    ),
+    fork := true
+  )
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings)
+
 lazy val user = project
   .settings(CommonSettings)
   .settings(
@@ -69,6 +87,7 @@ lazy val user = project
     ),
     fork := true
   )
+  .dependsOn(algebras)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings)
 
@@ -86,6 +105,7 @@ lazy val product = project
     ),
     fork := true
   )
+  .dependsOn(algebras)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings)
 
@@ -103,5 +123,6 @@ lazy val order = project
     ),
     fork := true
   )
+  .dependsOn(algebras)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings)

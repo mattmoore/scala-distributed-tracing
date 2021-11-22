@@ -4,13 +4,14 @@ import cats.effect.*
 import doobie.*
 import doobie.implicits.*
 import doobie.postgres.implicits.*
+import io.mattmoore.store.algebras.*
 import io.mattmoore.store.user.algebras.*
 import io.mattmoore.store.user.domain.*
 import natchez.Trace
 
 import java.util.UUID
 
-class UserRepositoryInterpreter[F[_]: Async: Trace](xa: Transactor[F]) extends Repository[F, User] {
+class UserRepositoryInterpreter[F[_]: Async: Trace](xa: Transactor[F]) extends RepositoryAlgebra[F, User] {
   override def query(id: UUID): F[User] =
     Trace[F].span(s"Fetching user with ID $id from database.") {
       Queries

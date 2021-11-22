@@ -5,6 +5,7 @@ import cats.effect.unsafe.implicits.global
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import com.dimafeng.testcontainers.munit.TestContainersForEach
 import doobie.util.transactor.Transactor
+import io.mattmoore.store.algebras.*
 import io.mattmoore.store.product.algebras.*
 import io.mattmoore.store.product.domain.*
 import io.mattmoore.store.product.repositories.*
@@ -51,7 +52,7 @@ class ProductRepositoryInterpreterSuite extends munit.FunSuite with TestContaine
 
   test("getProduct returns a product for the ID") {
     withContainers { case psql =>
-      val userRepository: Repository[F, Product] = new ProductRepositoryInterpreter(
+      val userRepository: RepositoryAlgebra[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -81,7 +82,7 @@ class ProductRepositoryInterpreterSuite extends munit.FunSuite with TestContaine
 
   test("addProduct adds a product and returns the new ID") {
     withContainers { case psql =>
-      val productRepository: Repository[F, Product] = new ProductRepositoryInterpreter(
+      val productRepository: RepositoryAlgebra[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -102,7 +103,7 @@ class ProductRepositoryInterpreterSuite extends munit.FunSuite with TestContaine
 
   test("updateProduct updates an existing product and returns the updated record") {
     withContainers { case psql =>
-      val productRepository: Repository[F, Product] = new ProductRepositoryInterpreter(
+      val productRepository: RepositoryAlgebra[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",

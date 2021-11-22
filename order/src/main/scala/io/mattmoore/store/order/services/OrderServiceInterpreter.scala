@@ -1,13 +1,14 @@
 package io.mattmoore.store.order.services
 
 import cats.effect.*
+import io.mattmoore.store.algebras.*
 import io.mattmoore.store.order.algebras.*
 import io.mattmoore.store.order.domain.*
 import natchez.Trace
 
 import java.util.UUID
 
-class OrderServiceInterpreter[F[_]: Async: Trace](repository: Repository[F, Order]) extends OrderService[F] {
+class OrderServiceInterpreter[F[_]: Async: Trace](repository: RepositoryAlgebra[F, Order]) extends OrderService[F] {
   override def get(id: UUID): F[Order] =
     Trace[F].span(s"Get order with ID $id") {
       repository.query(id)

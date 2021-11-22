@@ -5,6 +5,7 @@ import cats.effect.unsafe.implicits.global
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import com.dimafeng.testcontainers.munit.TestContainersForEach
 import doobie.util.transactor.Transactor
+import io.mattmoore.store.algebras.*
 import io.mattmoore.store.product.algebras.*
 import io.mattmoore.store.product.domain.*
 import io.mattmoore.store.product.repositories.*
@@ -45,7 +46,7 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
 
   test("get returns a product for the ID") {
     withContainers { case psql =>
-      val repository: Repository[F, Product] = new ProductRepositoryInterpreter(
+      val repository: RepositoryAlgebra[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -76,7 +77,7 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
 
   test("add adds a product and returns the updated product record") {
     withContainers { case psql =>
-      val repository: Repository[F, Product] = new ProductRepositoryInterpreter(
+      val repository: RepositoryAlgebra[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -98,7 +99,7 @@ class ProductServiceInterpreterSuite extends munit.FunSuite with TestContainersF
 
   test("update updates an existing product and returns the updated product record") {
     withContainers { case psql =>
-      val repository: Repository[F, Product] = new ProductRepositoryInterpreter(
+      val repository: RepositoryAlgebra[F, Product] = new ProductRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",

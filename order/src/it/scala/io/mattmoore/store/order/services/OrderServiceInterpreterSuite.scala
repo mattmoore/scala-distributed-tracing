@@ -5,6 +5,7 @@ import cats.effect.unsafe.implicits.global
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import com.dimafeng.testcontainers.munit.TestContainersForEach
 import doobie.util.transactor.Transactor
+import io.mattmoore.store.algebras.*
 import io.mattmoore.store.order.algebras.*
 import io.mattmoore.store.order.domain.*
 import io.mattmoore.store.order.repositories.*
@@ -46,7 +47,7 @@ class OrderServiceInterpreterSuite extends munit.FunSuite with TestContainersFor
 
   test("get returns an order for the ID") {
     withContainers { case psql =>
-      val repository: Repository[F, Order] = new OrderRepositoryInterpreter(
+      val repository: RepositoryAlgebra[F, Order] = new OrderRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -75,7 +76,7 @@ class OrderServiceInterpreterSuite extends munit.FunSuite with TestContainersFor
 
   test("add adds an order and returns the updated record") {
     withContainers { case psql =>
-      val repository: Repository[F, Order] = new OrderRepositoryInterpreter(
+      val repository: RepositoryAlgebra[F, Order] = new OrderRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",
@@ -96,7 +97,7 @@ class OrderServiceInterpreterSuite extends munit.FunSuite with TestContainersFor
 
   test("update updates an existing order and returns the updated record") {
     withContainers { case psql =>
-      val repository: Repository[F, Order] = new OrderRepositoryInterpreter(
+      val repository: RepositoryAlgebra[F, Order] = new OrderRepositoryInterpreter(
         Transactor.fromDriverManager[F](
           psql.container.getDriverClassName,
           s"${psql.container.getJdbcUrl}/${psql.container.getDatabaseName}",

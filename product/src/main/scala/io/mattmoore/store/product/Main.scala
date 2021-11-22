@@ -1,14 +1,15 @@
 package io.mattmoore.store.product
 
-import cats.effect._
-import doobie._
-import fs2.kafka._
-import natchez._
-import org.flywaydb.core._
-import io.mattmoore.store.product.algebras._
-import io.mattmoore.store.product.domain._
-import io.mattmoore.store.product.repositories._
-import io.mattmoore.store.product.services._
+import cats.effect.*
+import doobie.*
+import fs2.kafka.*
+import natchez.*
+import org.flywaydb.core.*
+import io.mattmoore.store.algebras.*
+import io.mattmoore.store.product.algebras.*
+import io.mattmoore.store.product.domain.*
+import io.mattmoore.store.product.repositories.*
+import io.mattmoore.store.product.services.*
 
 object Main extends IOApp {
   type F[A] = IO[A]
@@ -44,7 +45,7 @@ object Main extends IOApp {
             .dataSource("jdbc:postgresql:users", "postgres", "password")
             .load()
             .migrate()
-          val productRepository: Repository[F, Product] = new ProductRepositoryInterpreter(xa)
+          val productRepository: RepositoryAlgebra[F, Product] = new ProductRepositoryInterpreter(xa)
           val productService: ProductService[F] = new ProductServiceInterpreter[F](productRepository)
 
           val consumerSettings =

@@ -1,14 +1,16 @@
 package io.mattmoore.store.order
 
-import cats.effect._
-import doobie._
-import fs2.kafka._
-import natchez._
-import org.flywaydb.core._
-import io.mattmoore.store.order.algebras._
-import io.mattmoore.store.order.domain._
-import io.mattmoore.store.order.repositories._
-import io.mattmoore.store.order.services._
+import cats.effect.*
+import doobie.*
+import fs2.kafka.*
+import io.mattmoore.store.algebras.RepositoryAlgebra
+import natchez.*
+import org.flywaydb.core.*
+import io.mattmoore.store.algebras.*
+import io.mattmoore.store.order.algebras.*
+import io.mattmoore.store.order.domain.*
+import io.mattmoore.store.order.repositories.*
+import io.mattmoore.store.order.services.*
 
 object Main extends IOApp {
   type F[A] = IO[A]
@@ -44,7 +46,7 @@ object Main extends IOApp {
             .dataSource("jdbc:postgresql:users", "postgres", "password")
             .load()
             .migrate()
-          val orderRepository: Repository[F, Order] = new OrderRepositoryInterpreter(xa)
+          val orderRepository: RepositoryAlgebra[F, Order] = new OrderRepositoryInterpreter(xa)
           val orderService: OrderService[F] = new OrderServiceInterpreter[F](orderRepository)
 
           val consumerSettings =
