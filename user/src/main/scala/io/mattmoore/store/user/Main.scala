@@ -17,9 +17,8 @@ object Main extends IOApp {
   type F[A] = IO[A]
 
   def entryPoint[F[_]: Sync]: Resource[F, EntryPoint[F]] = {
+    import io.jaegertracing.Configuration.{ReporterConfiguration, SamplerConfiguration}
     import natchez.jaeger.Jaeger
-    import io.jaegertracing.Configuration.SamplerConfiguration
-    import io.jaegertracing.Configuration.ReporterConfiguration
     Jaeger.entryPoint[F]("UserService") { c =>
       Sync[F].delay {
         c.withSampler(new SamplerConfiguration().withType("const").withParam(1))
@@ -56,17 +55,23 @@ object Main extends IOApp {
               .withBootstrapServers("localhost:9092")
               .withGroupId("group")
 
-          KafkaConsumer.stream(consumerSettings)
-
-          userService
-            .add(
-              User(
-                firstName = "Matt",
-                lastName = "Moore",
-                email = "matt@mattmoore.io",
-                address = "123 Anywhere Street, Chicago, IL"
-              )
-            )
+          KafkaConsumer
+            .stream(consumerSettings)
+            .subscribeTo("user.created")
+            .records
+//            .evalMap { committableConsumerRecord =>
+//              userService
+//                .add(
+//                  User(
+//                    firstName = committableConsumerRecord.record.value,
+//                    lastName = "Moore",
+//                    email = "matt@mattmoore.io",
+//                    address = "123 Anywhere Street, Chicago, IL"
+//                  )
+//                )
+//            }
+            .compile
+            .drain
             .as(ExitCode.Success)
         }
       }
